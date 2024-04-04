@@ -7,13 +7,31 @@ public class WorldManager : MonoBehaviour
     private Container container;
 
     void Start()
-    {
-        GameObject cont = new GameObject("Container");
-        cont.transform.parent = transform;
-        container = cont.AddComponent<Container>();
-        container.Initialize(worldMaterial, Vector3.zero);
+        {
+            GameObject cont = new GameObject("Container");
+            cont.transform.parent = transform;
+            container = cont.AddComponent<Container>();
+            container.Initialize(worldMaterial, Vector3.zero);
 
-        container.GenerateMesh();
-        container.UploadMesh();
+            for (int x = 0; x < 16; x++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    int randomYHeight = Random.Range(1, 16);
+                    for (int y = 0; y < randomYHeight; y++)
+                    {
+                        container[new Vector3(x, y, z)] = new Voxel() { ID = 1 };
+                    }
+                }
+            }
+
+
+            container.GenerateMesh();
+            container.UploadMesh();
+        }
+
+    void update()
+    {
+        
     }
 }
