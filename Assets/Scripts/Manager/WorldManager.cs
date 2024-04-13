@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Data;
 using UnityEngine;
 public class WorldManager : MonoBehaviour
 {
@@ -37,9 +38,36 @@ public class WorldManager : MonoBehaviour
                 }
             }
         }
+        
+        UpdateMesh();
+    }
 
+    public void AddBlock(Vector3 blockPos, Voxel voxel = null)
+    {
+        if (voxel == null)
+            voxel = new Voxel() { ID = 1 };
+        container.AddVoxel(blockPos, voxel);
+        UpdateMesh();
+    }
 
-        container.GenerateMesh();
+    public void RemoveBlock(Vector3 blockPos)
+    {
+        container.RemoveVoxel(blockPos);
+    }
+
+    public void ClearBlocks()
+    {
+        container.ClearData();
+    }
+
+    public void RenderBlocks(Dictionary<Vector3, Voxel> blockDict)
+    {
+        UpdateMesh(blockDict);
+    }
+
+    public void UpdateMesh(Dictionary<Vector3, Voxel> voxelDict = null)
+    {
+        container.GenerateMesh(voxelDict);
         container.UploadMesh();
     }
 
@@ -50,7 +78,7 @@ public class WorldManager : MonoBehaviour
         get
         {
             if (_instance == null)
-                _instance = FindObjectOfType<WorldManager>();
+                _instance = GameObject.FindObjectOfType<WorldManager>();
             return _instance;
         }
     }

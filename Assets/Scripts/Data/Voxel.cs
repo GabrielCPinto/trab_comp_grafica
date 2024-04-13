@@ -1,16 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public struct Voxel
+namespace Data
 {
-    public byte ID;
+    public class Voxel
+    {
+        public byte ID;
+        public VoxelColor VoxelColor = WorldManager.Instance.WorldColors[0];
 
-    public bool isSolid
+        public bool IsSolid
         {
             get
             {
                 return ID != 0;
             }
         }
+    }
 }

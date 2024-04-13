@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Data;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -29,7 +31,20 @@ public class Container : MonoBehaviour
         data.Clear();
     }
 
-    public void GenerateMesh()
+    public void AddVoxel(Vector3 blockPos, Voxel voxel)
+    {
+        if (data.ContainsKey(blockPos))
+            data.Remove(blockPos);
+        data.Add(blockPos, voxel);
+    }
+
+    public void RemoveVoxel(Vector3 blockPos)
+    {
+        if (data.ContainsKey(blockPos))
+            data.Remove(blockPos);
+    }
+
+    public void GenerateMesh(Dictionary<Vector3, Voxel> voxelDict = null)
     {
         meshData.ClearData();
 
@@ -44,16 +59,26 @@ public class Container : MonoBehaviour
         Color voxelColorAlpha;
         Vector2 voxelSmoothness;
 
-        foreach (KeyValuePair<Vector3, Voxel> kvp in data)
+        var voxels = new Dictionary<Vector3, Voxel>(data);
+
+        if (voxelDict != null)
+            foreach (var kvp in voxelDict)
+            {
+                if (voxels.ContainsKey(kvp.Key))
+                    voxels.Remove(kvp.Key);
+                voxels.Add(kvp.Key, kvp.Value);
+            }
+
+        foreach (KeyValuePair<Vector3, Voxel> kvp in voxels)
         {
             //Only check on solid blocks
-            if (!kvp.Value.isSolid)
+            if (!kvp.Value.IsSolid)
                 continue;
 
             blockPos = kvp.Key;
             block = kvp.Value;
 
-            voxelColor = WorldManager.Instance.WorldColors[block.ID - 1];
+            voxelColor = block.VoxelColor;
             voxelColorAlpha = voxelColor.color;
             voxelColorAlpha.a = 1;
             voxelSmoothness = new Vector2(voxelColor.metallic, voxelColor.smoothness);
@@ -61,7 +86,7 @@ public class Container : MonoBehaviour
             for (int i = 0; i < 6; i++)
             {
                 //Check if there's a solid block against this face
-                if (this[blockPos + voxelFaceChecks[i]].isSolid)
+                if (this[blockPos + voxelFaceChecks[i]].IsSolid)
                     continue;
 
                 //Draw this face
